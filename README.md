@@ -16,11 +16,16 @@ Do all actions way faster (nearly instant). Be careful, you can die in blink of 
 
 Redux of FasterActionMod by __felipeds__ + fixed fishing. 
 
-This mod can cause visual bug "item message stuck" (very rare and I've probably fixed it, but who knows). Also can cause old bug "stuck with bare hands on pickup" (I've probably fixed it too).  
+This mod can cause visual bug "item message stuck" (very rare and I've probably fixed it, but who knows). This bug will disappear after change of location.
+
+Also can cause old bug "stuck with bare hands on pickup" (I've probably fixed it too). This bug will disappear only after save restart.
 
 To avoid bugs you can set action speed (container time works fine) to 0.5 (1.0 will be 100% safe) second in FasterActionRedux.xml. This will protect you from these very rare bugs (which I've probably fixed since I've didn't encounter them in 1h).
 
 I highly recommend you to try this mod despite possible bugs (very, very, very low possible bugs), it's pretty amazing and time saving. I can't play without this mod.
+
+# MapTweaks
+Increase map reveal radius or enable automapping (no charcoal required)
 
 # SkipIntroRedux
 Skip disclaimer (autoclick) and intro. Fading removal on main menu is broken, I'll probably fix it later. 
@@ -28,6 +33,9 @@ Skip disclaimer (autoclick) and intro. Fading removal on main menu is broken, I'
 Redux of SkipIntro by __ossian__.
 
 You can configure mod in SkipIntroRedux.xml.
+
+# StruggleTweaks
+Set chance to instantly kill wolf after struggle or change bleedout time for wolf. Also you can change tap power to save your mouse buttons :)
 
 # TweakRabbits
 Change duration of stun or kill rabbit instantly if hit with rock.
