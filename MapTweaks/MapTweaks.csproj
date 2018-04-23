@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{304B1036-DBC4-47FA-88B5-3A7901801221}</ProjectGuid>
+    <ProjectGuid>{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TweakRabbits</RootNamespace>
-    <AssemblyName>TweakRabbits</AssemblyName>
+    <RootNamespace>MapTweaks</RootNamespace>
+    <AssemblyName>MapTweaks</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -51,7 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TweakRabbits.cs" />
+    <Compile Include="MapTweaks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

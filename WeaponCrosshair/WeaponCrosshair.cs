@@ -11,7 +11,7 @@ static class WeaponCrosshair
     static bool rifleCrosshair = false;
     static bool bowCrosshair = false;
 
-    static WeaponCrosshair()
+    static public void OnLoad()
     {
         Debug.LogFormat("WeaponCrosshair: init");
 
@@ -21,18 +21,32 @@ static class WeaponCrosshair
         XmlDocument xml = new XmlDocument();
         xml.Load(configPath);
 
-        if (!bool.TryParse(xml.SelectSingleNode("/config/stone_crosshair").Attributes["value"].Value, out stoneCrosshair))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/stone_crosshair"), out stoneCrosshair))
         {
-            Debug.LogFormat("TweakRabbits: missing 'stone_crosshair' entry");
+            Debug.LogFormat("WeaponCrosshair: missing/invalid 'stone_crosshair' entry");
+            stoneCrosshair = false;
         }
-        if (!bool.TryParse(xml.SelectSingleNode("/config/rifle_crosshair").Attributes["value"].Value, out rifleCrosshair))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/rifle_crosshair"), out rifleCrosshair))
         {
-            Debug.LogFormat("TweakRabbits: missing 'rifle_crosshair' entry");
+            Debug.LogFormat("WeaponCrosshair: missing/invalid 'rifle_crosshair' entry");
+            rifleCrosshair = false;
         }
-        if (!bool.TryParse(xml.SelectSingleNode("/config/bow_crosshair").Attributes["value"].Value, out bowCrosshair))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/bow_crosshair"), out bowCrosshair))
         {
-            Debug.LogFormat("TweakRabbits: missing 'bow_crosshair' entry");
+            Debug.LogFormat("WeaponCrosshair: missing/invalid 'bow_crosshair' entry");
+            bowCrosshair = false;
         }
+    }
+
+    static private bool GetNodeBool(XmlNode node, out bool value)
+    {
+        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = false;
+            return false;
+        }
+
+        return true;
     }
 
     [HarmonyPatch(typeof(HUDManager), "UpdateCrosshair")]

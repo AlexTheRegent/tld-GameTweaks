@@ -10,7 +10,7 @@ static class TweakRabbits
     static float stunDuration = -1f;
     static bool killOnHit = true;
 
-    static TweakRabbits()
+    static public void OnLoad()
     {
         Debug.LogFormat("TweakRabbits: init");
 
@@ -20,16 +20,39 @@ static class TweakRabbits
         XmlDocument xml = new XmlDocument();
         xml.Load(configPath);
 
-        if (!float.TryParse(xml.SelectSingleNode("/config/stun_duration").Attributes["value"].Value, out stunDuration))
+        if (!GetNodeFloat(xml.SelectSingleNode("/config/stun_duration"), out stunDuration))
         {
-            Debug.LogFormat("TweakRabbits: missing 'stun_duration' entry");
+            Debug.LogFormat("TweakRabbits: missing/invalid 'stun_duration' entry");
             stunDuration = -1f;
         }
 
-        if (!bool.TryParse(xml.SelectSingleNode("/config/kill_on_hit").Attributes["value"].Value, out killOnHit))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/kill_on_hit"), out killOnHit))
         {
-            Debug.LogFormat("TweakRabbits: missing 'kill_on_hit' entry");
+            Debug.LogFormat("TweakRabbits: missing/invalid 'kill_on_hit' entry");
+            killOnHit = true;
         }
+    }
+
+    static private bool GetNodeBool(XmlNode node, out bool value)
+    {
+        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = false;
+            return false;
+        }
+
+        return true;
+    }
+
+    static private bool GetNodeFloat(XmlNode node, out float value)
+    {
+        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = -1f;
+            return false;
+        }
+
+        return true;
     }
 
     [HarmonyPatch(typeof(BaseAi), "EnterStunned")]

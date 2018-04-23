@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DetectionRange", "Detection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeaponCrosshair", "WeaponCrosshair\WeaponCrosshair.csproj", "{BD4384F5-A7E5-4BFD-80AF-6C99AC854B81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapTweaks", "MapTweaks\MapTweaks.csproj", "{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StruggleTweaks", "StruggleTweaks\StruggleTweaks.csproj", "{DAF59C7B-B568-4A66-BECA-0D8B47971845}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{BD4384F5-A7E5-4BFD-80AF-6C99AC854B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD4384F5-A7E5-4BFD-80AF-6C99AC854B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD4384F5-A7E5-4BFD-80AF-6C99AC854B81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{510300D9-69D5-448C-9EFC-4EDEC76F9BC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

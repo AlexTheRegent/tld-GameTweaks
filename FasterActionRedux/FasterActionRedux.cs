@@ -10,7 +10,7 @@ static class FasterActionRedux
     static float containerTime = 0.01f;
     static float actionTime = 0.1f;
 
-    static FasterActionRedux()
+    static public void OnLoad()
     {
         Debug.LogFormat("FasterActionRedux: init");
 
@@ -20,17 +20,28 @@ static class FasterActionRedux
         XmlDocument xml = new XmlDocument();
         xml.Load(configPath);
 
-        if (!float.TryParse(xml.SelectSingleNode("/config/action_time").Attributes["value"].Value, out actionTime))
+        if (!GetNodeFloat(xml.SelectSingleNode("/config/action_time"), out actionTime))
         {
-            Debug.LogFormat("FasterActionRedux: missing 'action_time' entry");
+            Debug.LogFormat("FasterActionRedux: missing/invalid 'action_time' entry");
             actionTime = 0.1f;
         }
 
-        if (!float.TryParse(xml.SelectSingleNode("/config/container_time").Attributes["value"].Value, out containerTime))
+        if (!GetNodeFloat(xml.SelectSingleNode("/config/container_time"), out containerTime))
         {
-            Debug.LogFormat("FasterActionRedux: missing 'container_time' entry");
+            Debug.LogFormat("FasterActionRedux: missing/invalid 'container_time' entry");
             containerTime = 0.01f;
         }
+    }
+
+    static private bool GetNodeFloat(XmlNode node, out float value)
+    {
+        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = -1f;
+            return false;
+        }
+
+        return true;
     }
 
     // time for these actions is hardcoded or calculated on fly 

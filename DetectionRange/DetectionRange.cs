@@ -29,7 +29,7 @@ static class DetectionRange
 
     static xml_parameters[] config = new xml_parameters[(int)AnimalType.TOTAL];
 
-    static DetectionRange()
+    static public void OnLoad()
     {
         Debug.LogFormat("DetectionRange: init");
 
@@ -48,31 +48,42 @@ static class DetectionRange
 
     static void parse_xml_node(XmlNode node, int idx)
     {
-        if (!float.TryParse(node.SelectSingleNode("hear_range").Attributes["value"].Value, out config[idx].hear_range))
+        if (!GetNodeFloat(node.SelectSingleNode("hear_range"), out config[idx].hear_range))
         {
             Debug.LogFormat("DetectionRange: missing 'hear_range' entry for '{0}' section", get_animal_name(idx));
             config[idx].hear_range = -1f;
         }
-        if (!float.TryParse(node.SelectSingleNode("hear_range_while_feeding").Attributes["value"].Value, out config[idx].hear_range_while_feeding))
+        if (!GetNodeFloat(node.SelectSingleNode("hear_range_while_feeding"), out config[idx].hear_range_while_feeding))
         {
             Debug.LogFormat("DetectionRange: missing 'hear_range_while_feeding' entry for '{0}' section", get_animal_name(idx));
             config[idx].hear_range_while_feeding = -1f;
         }
-        if (!float.TryParse(node.SelectSingleNode("smell_range").Attributes["value"].Value, out config[idx].smell_range))
+        if (!GetNodeFloat(node.SelectSingleNode("smell_range"), out config[idx].smell_range))
         {
             Debug.LogFormat("DetectionRange: missing 'smell_range' entry for '{0}' section", get_animal_name(idx));
             config[idx].smell_range = -1f;
         }
-        if (!float.TryParse(node.SelectSingleNode("detection_range").Attributes["value"].Value, out config[idx].detection_range))
+        if (!GetNodeFloat(node.SelectSingleNode("detection_range"), out config[idx].detection_range))
         {
             Debug.LogFormat("DetectionRange: missing 'detection_range' entry for '{0}' section", get_animal_name(idx));
             config[idx].detection_range = -1f;
         }
-        if (!float.TryParse(node.SelectSingleNode("detection_range_while_feeding").Attributes["value"].Value, out config[idx].detection_range_while_feeding))
+        if (!GetNodeFloat(node.SelectSingleNode("detection_range_while_feeding"), out config[idx].detection_range_while_feeding))
         {
             Debug.LogFormat("DetectionRange: missing 'detection_range_while_feeding' entry for '{0}' section", get_animal_name(idx));
             config[idx].detection_range_while_feeding = -1f;
         }
+    }
+
+    static private bool GetNodeFloat(XmlNode node, out float value)
+    {
+        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = -1f;
+            return false;
+        }
+
+        return true;
     }
 
     static string get_animal_name(int idx)

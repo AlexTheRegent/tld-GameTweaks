@@ -11,7 +11,7 @@ static class SkipIntroRedux
     static bool skipIntro = true;
     static bool skipFade = true;
 
-    static SkipIntroRedux()
+    static public void OnLoad()
     {
         Debug.LogFormat("SkipIntroRedux: init");
 
@@ -21,20 +21,34 @@ static class SkipIntroRedux
         XmlDocument xml = new XmlDocument();
         xml.Load(configPath);
 
-        if (!bool.TryParse(xml.SelectSingleNode("/config/skip_disclaimer").Attributes["value"].Value, out skipDisclaimer))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/skip_disclaimer"), out skipDisclaimer))
         {
-            Debug.LogFormat("FasterActionRedux: missing 'skip_disclaimer' entry");
+            Debug.LogFormat("SkipIntroRedux: missing/invalid 'skip_disclaimer' entry");
+            skipDisclaimer = true;
         }
 
-        if (!bool.TryParse(xml.SelectSingleNode("/config/skip_intro").Attributes["value"].Value, out skipIntro))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/skip_intro"), out skipIntro))
         {
-            Debug.LogFormat("FasterActionRedux: missing 'skip_intro' entry");
+            Debug.LogFormat("SkipIntroRedux: missing/invalid 'skip_intro' entry");
+            skipIntro = true;
         }
 
-        if (!bool.TryParse(xml.SelectSingleNode("/config/skip_fade").Attributes["value"].Value, out skipFade))
+        if (!GetNodeBool(xml.SelectSingleNode("/config/skip_fade"), out skipFade))
         {
-            Debug.LogFormat("FasterActionRedux: missing 'skip_fade' entry");
+            Debug.LogFormat("SkipIntroRedux: missing/invalid 'skip_fade' entry");
+            skipFade = true;
         }
+    }
+
+    static private bool GetNodeBool(XmlNode node, out bool value)
+    {
+        if (node==null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
+        {
+            value = false;
+            return false;
+        }
+
+        return true;
     }
 
     // Skip Disclaimer 
