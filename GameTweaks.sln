@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapTweaks", "MapTweaks\MapT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StruggleTweaks", "StruggleTweaks\StruggleTweaks.csproj", "{DAF59C7B-B568-4A66-BECA-0D8B47971845}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeAccelerator", "TimeAccelerator\TimeAccelerator.csproj", "{19FB6245-4E64-4DE6-9E6D-32EC38324F58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAF59C7B-B568-4A66-BECA-0D8B47971845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

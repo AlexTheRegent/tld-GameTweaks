@@ -10,6 +10,7 @@ static class SkipIntroRedux
     static bool skipDisclaimer = true;
     static bool skipIntro = true;
     static bool skipFade = true;
+    static bool fakeInput = false;
 
     static public void OnLoad()
     {
@@ -75,25 +76,34 @@ static class SkipIntroRedux
             {
                 MoviePlayer.m_HasIntroPlayedForMainMenu = true;
             }
+            if (skipFade)
+            {
+                __instance.m_StartFadedOut = true;
+            }
         }
     }
-
+    
     [HarmonyPatch(typeof(Panel_MainMenu), "UpdateFading")]
     public class FasterActionSkipFade
     {
-        public static void Postfix(Panel_MainMenu __instance)
+        public static void Prefix(Panel_MainMenu __instance)
         {
-            if (skipFade)
-                __instance.m_InitialScreenFadeInDuration = 0f;
+            fakeInput = true;
+            __instance.m_FadeInTimeSeconds = 0.00001f;
+            __instance.m_InitialScreenFadeInDuration = 0f;
         }
     }
 
-    [HarmonyPatch(typeof(Panel_MainMenu), "FadeOutPanel")]
-    public class FasterActionSkipFade2
+    [HarmonyPatch(typeof(InputManager), "AnyInput")]
+    public class FasterActionFakeInput
     {
-        public static bool Prefix(Panel_MainMenu __instance)
+        public static void Postfix(ref bool __result)
         {
-            return false;
+            if (fakeInput)
+            {
+                fakeInput = false;
+                __result = true;
+            }
         }
     }
 }

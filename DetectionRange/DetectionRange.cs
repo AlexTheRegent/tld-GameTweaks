@@ -141,7 +141,7 @@ static class DetectionRange
         if (config[idx].hear_range >= 0f)
             inst.m_HearFootstepsRange = config[idx].hear_range;
 
-        if (config[idx].hear_range_while_feeding >= 0f)
+        if (config[idx].detection_range_while_feeding >= 0f)
             inst.m_DetectionRangeWhileFeeding = config[idx].detection_range_while_feeding;
 
         if (config[idx].detection_range >= 0f)
