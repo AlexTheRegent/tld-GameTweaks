@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StruggleTweaks", "StruggleT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeAccelerator", "TimeAccelerator\TimeAccelerator.csproj", "{19FB6245-4E64-4DE6-9E6D-32EC38324F58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BleedingTweaks", "ClassLibrary1\BleedingTweaks.csproj", "{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

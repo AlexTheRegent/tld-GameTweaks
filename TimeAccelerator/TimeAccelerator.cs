@@ -8,11 +8,11 @@ using UnityEngine;
 static class TimeAccelerator
 {
     static string configFileName = "TimeAccelerator.xml";
-    static string accelerationKey = "E";
+    static string accelerationKey = "V";
     static float accelerationValue = 3.0f;
     static bool holdToAccelerate = false;
     static bool accelerated = false;
-    static KeyCode accelerationKeyCode = KeyCode.E;
+    static KeyCode accelerationKeyCode = KeyCode.V;
 
     static public void OnLoad()
     {
@@ -40,7 +40,7 @@ static class TimeAccelerator
         if (!Enum.IsDefined(typeof(KeyCode), accelerationKeyCode) && !accelerationKeyCode.ToString().Contains(","))
         {
             Debug.LogFormat("TimeAccelerator: invalid key for 'acceleration_key' entry");
-            accelerationKeyCode = KeyCode.E;
+            accelerationKeyCode = KeyCode.V;
         }
 
         if (!GetNodeBool(xml.SelectSingleNode("/config/hold_to_accelerate"), out holdToAccelerate))
@@ -54,7 +54,7 @@ static class TimeAccelerator
     {
         if (node == null || node.Attributes["value"] == null)
         {
-            value = "E";
+            value = "V";
             return false;
         }
 

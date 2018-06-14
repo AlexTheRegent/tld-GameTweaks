@@ -79,7 +79,6 @@ static class MapTweaks
                 lastDrawTime += Time.deltaTime;
                 if (lastDrawTime >= autodrawDelay)
                 {
-                    Debug.LogFormat("MapTweaks: UpdateCrosshair");
                     InterfaceManager.m_Panel_Map.DoNearbyDetailsCheck(InterfaceManager.m_Panel_Map.m_DetailSurveyRadiusMeters);
                     lastDrawTime = 0f;
                 }

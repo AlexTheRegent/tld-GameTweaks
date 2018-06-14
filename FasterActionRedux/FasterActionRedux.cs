@@ -301,7 +301,7 @@ static class FasterActionRedux
     [HarmonyPatch(typeof(Harvestable), "CompletedHarvest")]
     public class FasterActionHarvestingPlantFix
     { 
-        public static void Prefix(Harvestable __instance)
+        public static void Postfix(Harvestable __instance)
         {
             Debug.LogFormat("Harvestable::CompletedHarvest");
             InterfaceManager.m_Panel_HUD.SetHoverText(string.Empty, null, false);
@@ -395,7 +395,7 @@ static class FasterActionRedux
             __instance.m_PassTimeRealtimeSecondsPerHour = actionTime;
         }
     }
-    
+
     // Sleeping       
     [HarmonyPatch(typeof(Rest), "Start")]
     public class FasterActionSleeping
@@ -404,6 +404,18 @@ static class FasterActionRedux
         {
             Debug.LogFormat("Rest::Start");
             __instance.m_SleepFadeOutSeconds = actionTime;
+        }
+    }
+
+    // Unlocking containers        
+    [HarmonyPatch(typeof(Lock), "StartInteract")]
+    public class FasterActionPrybarUnlocking
+    {
+        public static void Prefix(Lock __instance)
+        {
+            Debug.LogFormat("Lock::StartInteract");
+            __instance.m_ForceLockDurationSecondsMin = actionTime;
+            __instance.m_ForceLockDurationSecondsMax = actionTime;
         }
     }
 
@@ -434,7 +446,7 @@ static class FasterActionRedux
         public static void Prefix()
         {
             Debug.LogFormat("LoadingZone::StartInteract");
-            GameManager.GetInterfaceManager().m_SceneTransitionSeconds = actionTime;
+            GameManager.GetInterfaceManager().m_SceneTransitionSeconds = actionTime * 2;
             GameManager.m_SceneTransitionFadeOutTime = actionTime;
         }
     }
@@ -445,7 +457,7 @@ static class FasterActionRedux
         public static void Prefix()
         {
             Debug.LogFormat("LoadScene::StartInteract");
-            GameManager.GetInterfaceManager().m_SceneTransitionSeconds = actionTime;
+            GameManager.GetInterfaceManager().m_SceneTransitionSeconds = actionTime * 2;
             GameManager.m_SceneTransitionFadeOutTime = actionTime;
         }
     }
