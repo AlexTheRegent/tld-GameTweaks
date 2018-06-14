@@ -37,6 +37,10 @@ You can configure mod in SkipIntroRedux.xml.
 # StruggleTweaks
 Set chance to instantly kill wolf after struggle or change bleedout time for wolf. Also you can change tap power to save your mouse buttons :)
 
+# TimeAccelerator
+Speed up everything in the world to travel faster or do something faster. 
+You can change acceleration speed, button for acceleration and acceleration mode (press or hold button) in TimeAccelerator.xml.
+
 # TweakRabbits
 Change duration of stun or kill rabbit instantly if hit with rock.
 
