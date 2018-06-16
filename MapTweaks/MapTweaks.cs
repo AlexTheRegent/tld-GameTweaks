@@ -34,17 +34,6 @@ static class MapTweaks
         }
     }
 
-    static private bool GetNodeBool(XmlNode node, out bool value)
-    {
-        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = false;
-            return false;
-        }
-
-        return true;
-    }
-
     static private bool GetNodeFloat(XmlNode node, out float value)
     {
         if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
