@@ -1,15 +1,22 @@
 # Installation
  - [Detailed instuction](https://github.com/WulfMarius/ModComponent/wiki/Installing-a-Mod)
  - Only difference is that you have to unzip archive into mods directory (every mod have configuration .xml file) instead of placing .dll file
+ 
+# CookingTweaks
+Change time of food prerapation (cooking/burning) or water processing (melting/boiling/drying).
+
+Also this tweak fixes inconvenience in less than 1kg meat preparation (for example, 1kg and 100g of rabbit is cooking 1h 15min, and this tweak will decrease cooking time based on meat weight, so 100g of rabbit meat will cook 10 times faster).    
+
+**Imporatant: adjust values in CookingTweaks.xml!**
 
 # DetectionRange
 Change animals detection distance. No more wolves who see/hear/smell you from far distance. 
 
 Or you can make game more challenging and make wolves to start looking for you if you leave your home ;) 
 
-By default does nothing, adjust values in DetectionRange.xml.
-
 You can also change detection range for rabbits, deers, bears, mooses.
+
+**Imporatant: adjust values in DetectionRange.xml!**
 
 # FasterActionRedux
 Do all actions way faster (nearly instant). Be careful, you can die in blink of eye, if you choose action that is very long (such as harvesting meat from bear)!
@@ -39,7 +46,8 @@ Set chance to instantly kill wolf after struggle or change bleedout time for wol
 
 # TimeAccelerator
 Speed up everything in the world to travel faster or do something faster. 
-You can change acceleration speed, button for acceleration and acceleration mode (press or hold button) in TimeAccelerator.xml.
+
+**Imporatant: adjust values in TimeAccelerator.xml!**
 
 # TweakRabbits
 Change duration of stun or kill rabbit instantly if hit with rock.
