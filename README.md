@@ -7,6 +7,7 @@ Change time of food prerapation (cooking/burning) or water processing (melting/b
 
 Also this tweak fixes inconvenience in less than 1kg meat preparation (for example, 1kg and 100g of rabbit is cooking 1h 15min, and this tweak will decrease cooking time based on meat weight, so 100g of rabbit meat will cook 10 times faster).    
 
+**Warning: it does not change displaying cooking time in cans/pots/etc, but it will change once you start cooking!**
 **Imporatant: adjust values in CookingTweaks.xml!**
 
 # DetectionRange
