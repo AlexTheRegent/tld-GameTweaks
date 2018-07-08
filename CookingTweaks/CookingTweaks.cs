@@ -24,6 +24,9 @@ static class CookingTweaks
         REISHITEA,
         ROSETEA,
         COFFEE,
+        COFFEETIN,
+        TEA,
+        TEAPACKAGE,
         TOTAL,
     }
 
@@ -39,8 +42,6 @@ static class CookingTweaks
     static float meltingTime;
     static float boilingTime;
     static float dryingTime;
-
-    static bool multiply_weigth;
 
     static public void OnLoad()
     {
@@ -66,26 +67,26 @@ static class CookingTweaks
         parse_xml_node(xml.DocumentElement.SelectNodes("/config/reishitea")[0], (int)FoodType.REISHITEA);
         parse_xml_node(xml.DocumentElement.SelectNodes("/config/rosetea")[0], (int)FoodType.ROSETEA);
         parse_xml_node(xml.DocumentElement.SelectNodes("/config/coffee")[0], (int)FoodType.COFFEE);
+        parse_xml_node(xml.DocumentElement.SelectNodes("/config/coffeetin")[0], (int)FoodType.COFFEETIN);
+        parse_xml_node(xml.DocumentElement.SelectNodes("/config/tea")[0], (int)FoodType.TEA);
+        parse_xml_node(xml.DocumentElement.SelectNodes("/config/teapackage")[0], (int)FoodType.TEAPACKAGE);
 
         if (!GetNodeFloat(xml.SelectSingleNode("/config/water/melting"), out meltingTime))
         {
             Debug.LogFormat("CookingTweaks: missing/invalid 'melting' entry");
             meltingTime = -1f;
         }
+
         if (!GetNodeFloat(xml.SelectSingleNode("/config/water/boiling"), out boilingTime))
         {
             Debug.LogFormat("CookingTweaks: missing/invalid 'boiling' entry");
             boilingTime = -1f;
         }
+
         if (!GetNodeFloat(xml.SelectSingleNode("/config/water/drying"), out dryingTime))
         {
             Debug.LogFormat("CookingTweaks: missing/invalid 'drying' entry");
             dryingTime = -1f;
-        }
-        if (!GetNodeBool(xml.SelectSingleNode("/config/multiply_weight"), out multiply_weigth))
-        {
-            Debug.LogFormat("CookingTweaks: missing/invalid 'multiply_weight' entry");
-            multiply_weigth = false;
         }
     }
 
@@ -135,6 +136,12 @@ static class CookingTweaks
                 return "rosetea";
             case (int)FoodType.COFFEE:
                 return "coffee";
+            case (int)FoodType.COFFEETIN:
+                return "coffee";
+            case (int)FoodType.TEA:
+                return "tea";
+            case (int)FoodType.TEAPACKAGE:
+                return "tea";
         }
 
         return string.Empty;
@@ -165,34 +172,34 @@ static class CookingTweaks
     [HarmonyPatch(typeof(CookingPotItem), "StartCooking")]
     public class CookingTweaksCookingFood
     { 
-        public static void Prefix(CookingPotItem __instance, GearItem gearItemToCook)
+        public static void Postfix(CookingPotItem __instance, GearItem gearItemToCook)
         {
             Debug.LogFormat("CookingTweaks: item id: \"{0}\", cooking time: \"{1}\", burning time: \"{2}\"", gearItemToCook.m_LocalizedDisplayName.m_LocalizationID, gearItemToCook.m_Cookable.m_CookTimeMinutes, gearItemToCook.m_Cookable.m_ReadyTimeMinutes);
             switch (gearItemToCook.m_LocalizedDisplayName.m_LocalizationID)
             {
                 case "GAMEPLAY_BearMeatRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.BEAR], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.BEAR]);
                     break;
                 case "GAMEPLAY_RabbitRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.RABBIT], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.RABBIT]);
                     break;
                 case "GAMEPLAY_RawCohoSalmon":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.SALMON], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.SALMON]);
                     break;
                 case "GAMEPLAY_RawLakeWhiteFish":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.WHITEFISH], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.WHITEFISH]);
                     break;
                 case "GAMEPLAY_RawRainbowTrout":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.RAINBOWTROUT], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.RAINBOWTROUT]);
                     break;
                 case "GAMEPLAY_RawSmallMouthBass":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.BASS], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.BASS]);
                     break;
                 case "GAMEPLAY_VenisonRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.DEER], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.DEER]);
                     break;
                 case "GAMEPLAY_WolfMeatRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.WOLF], multiply_weigth);
+                    UpdateValues(gearItemToCook, config[(int)FoodType.WOLF]);
                     break;
                 case "GAMEPLAY_PinnaclePeaches":
                     UpdateValues(gearItemToCook, config[(int)FoodType.PEACHES]);
@@ -212,15 +219,24 @@ static class CookingTweaks
                 case "GAMEPLAY_CoffeeCup":
                     UpdateValues(gearItemToCook, config[(int)FoodType.COFFEE]);
                     break;
+                case "GAMEPLAY_CoffeeTin":
+                    UpdateValues(gearItemToCook, config[(int)FoodType.COFFEETIN]);
+                    break;
+                case "GAMEPLAY_GreenTeaCup":
+                    UpdateValues(gearItemToCook, config[(int)FoodType.TEA]);
+                    break;
+                case "GAMEPLAY_GreenTeaPackage":
+                    UpdateValues(gearItemToCook, config[(int)FoodType.TEAPACKAGE]);
+                    break;
             }
         }
     }
 
-    static private void UpdateValues(GearItem gearItem, xml_parameters settings, bool weigth = false)
+    static private void UpdateValues(GearItem gearItem, xml_parameters settings)
     {
         if (settings.cookingTime >= 0f)
         {
-            gearItem.m_Cookable.m_CookTimeMinutes = settings.cookingTime * (weigth ? gearItem.GetItemWeightKG() / 1f : 1f);
+            gearItem.m_Cookable.m_CookTimeMinutes = settings.cookingTime * GameManager.GetSkillCooking().GetCookingTimeScale();
         }
         if (settings.readyTime >= 0f)
         {
