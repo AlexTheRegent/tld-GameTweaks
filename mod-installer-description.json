@@ -1,0 +1,125 @@
+{
+	"name": "AlexTheRegent TLD-GameTweaks",
+	"description": "The Long Dark: AlexTheRegent Game Tweaks",
+	"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+	"releases": [
+		{
+			"name": "CookingTweaks",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Change time of food prerapation (cooking/burning) or water processing (melting/boiling/drying).\n\nAlso this tweak fixes inconvenience in less than 1kg meat preparation (for example, 1kg and 100g of rabbit is cooking 1h 15min, and this tweak will decrease cooking time based on meat weight, so 100g of rabbit meat will cook 10 times faster).\n\nWarning: it does not change displaying cooking time in cans/pots/etc, but it will change once you start cooking! Important: Adjust values in CookingTweaks.xml!",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/CookingTweaks.zip"
+				}
+			]
+		}, {
+			"name": "DetectionRange",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Change animals detection distance. No more wolves who see/hear/smell you from far distance.\n\nOr you can make game more challenging and make wolves to start looking for you if you leave your home ;)\n\nYou can also change detection range for rabbits, deers, bears, mooses.\n\nImportant: adjust values in DetectionRange.xml!",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/DetectionRange.zip"
+				}
+			]
+		}, {
+			"name": "FasterActionRedux",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Do all actions way faster (nearly instant). Be careful, you can die in blink of eye, if you choose action that is very long (such as harvesting meat from bear)!\n\nRedux of FasterActionMod by felipeds + fixed fishing.\n\nThis mod can cause visual bug \"item message stuck\" (very rare and I've probably fixed it, but who knows). This bug will disappear after change of location.\n\nAlso can cause old bug \"stuck with bare hands on pickup\" (I've probably fixed it too). This bug will disappear only after save restart.\n\nTo avoid bugs you can set action speed (container time works fine) to 0.5 (1.0 will be 100% safe) second in FasterActionRedux.xml. This will protect you from these very rare bugs (which I've probably fixed since I've didn't encounter them in 1h).\n\nI highly recommend you to try this mod despite possible bugs (very, very, very low possible bugs), it's pretty amazing and time saving. I can't play without this mod.",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/FasterActionRedux.zip"
+				}
+			]
+		}, {
+			"name": "MapTweaks",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Increase map reveal radius or enable automapping (no charcoal required)",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/MapTweaks.zip"
+				}
+			]
+		}, {
+			"name": "SkipIntroRedux",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Skip disclaimer (autoclick) and intro. Fading removal on main menu is broken, I'll probably fix it later.\n\nRedux of SkipIntro by ossian.\n\nYou can configure mod in SkipIntroRedux.xml.",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/SkipIntroRedux.zip"
+				}
+			]
+		}, {
+			"name": "StruggleTweaks",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Set chance to instantly kill wolf after struggle or change bleedout time for wolf. Also you can change tap power to save your mouse buttons :)",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/StruggleTweaks.zip"
+				}
+			]
+		}, {
+			"name": "TimeAccelerator",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Speed up everything in the world to travel faster or do something faster.\n\nImportant: adjust values in TimeAccelerator.xml!",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/TimeAccelerator.zip"
+				}
+			]
+		}, {
+			"name": "TweakRabbits",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Change duration of stun or kill rabbit instantly if hit with rock.\n\nYou can configure mod in TweakRabbits.xml.",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/TweakRabbits.zip"
+				}
+			]
+		}, {
+			"name": "WeaponCrosshair",
+			"version": "v1.0.4",
+			"releaseDate": "2018-07-08",
+			"description": "Show crosshair when zooming with stone (enabled by default), bow (disabled by default), rifle (disabled by default).\n\nYou can configure settings in WeaponCrosshair.xml.",
+			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
+			"changes": "",
+			"dependencies": [],
+			"assets": [
+				{
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/WeaponCrosshair.zip"
+				}
+			]
+		}
+	]
+}
