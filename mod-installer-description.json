@@ -5,15 +5,15 @@
 	"releases": [
 		{
 			"name": "CookingTweaks",
-			"version": "v1.0.4",
-			"releaseDate": "2018-07-08",
-			"description": "Change time of food prerapation (cooking/burning) or water processing (melting/boiling/drying).\n\nAlso this tweak fixes inconvenience in less than 1kg meat preparation (for example, 1kg and 100g of rabbit is cooking 1h 15min, and this tweak will decrease cooking time based on meat weight, so 100g of rabbit meat will cook 10 times faster).\n\nWarning: it does not change displaying cooking time in cans/pots/etc, but it will change once you start cooking! Important: Adjust values in CookingTweaks.xml!",
+			"version": "v1.0.5",
+			"releaseDate": "2018-07-11",
+			"description": "Change time of food prerapation (cooking/burning) or water processing (melting/boiling/drying).\n\nWarning: it does not change displaying cooking time in cans/pots/etc, but it will change once you start cooking!\n\nImportant: Adjust values in CookingTweaks.xml!",
 			"url": "https://github.com/AlexTheRegent/tld-GameTweaks",
 			"changes": "",
 			"dependencies": [],
 			"assets": [
 				{
-					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.4/CookingTweaks.zip"
+					"url": "https://github.com/AlexTheRegent/tld-GameTweaks/releases/download/v1.0.5/CookingTweaks.zip"
 				}
 			]
 		}, {
