@@ -37,6 +37,9 @@
     <Reference Include="Harmony">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\TheLongDark\tld_Data\Managed\Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="ModSettings">
+      <HintPath>..\..\..\..\Programs\Steam\steamapps\common\TheLongDark\mods\ModSettings.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

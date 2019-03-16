@@ -1,55 +1,59 @@
-﻿using System.Xml;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
 
 static class StruggleTweaks
 {
-    static string configFileName = "StruggleTweaks.xml";
     static float chanceToKillWolfAfterStruggle = 100f;
     static float wolfBleedoutMinutes = 1f;
     static float tapIncrement = 1f;
+
+    internal class StruggleTweaksSettings : ModSettingsBase
+    {
+        [Name("Change to instantly kill wolf after struggle")]
+        [Description("Default value is 0")]
+        [Slider(0f, 100f, 101)]
+        public float chanceToKillWolfAfterStruggle = 100f;
+
+        [Name("Wolf bleedout time, in-game minutes")]
+        [Description("0 = default bleadout time")]
+        [Slider(0f, 500f, 501)]
+        public float wolfBleedoutMinutes = 30f;
+
+        [Name("Tap increment")]
+        [Description("Default value varies from weapon to weapon, multiplier (0 = disabled, 1 = 100%, 2 = 200%)")]
+        [Slider(0f, 20f, 201)]
+        public float tapIncrement = 1f;
+
+        protected override void OnConfirm()
+        {
+            StruggleTweaks.chanceToKillWolfAfterStruggle = chanceToKillWolfAfterStruggle;
+            StruggleTweaks.wolfBleedoutMinutes = wolfBleedoutMinutes;
+            StruggleTweaks.tapIncrement = tapIncrement;
+
+            string settings = FastJson.Serialize(this);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "StruggleTweaks.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("StruggleTweaks: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        StruggleTweaksSettings settings = new StruggleTweaksSettings();
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "StruggleTweaks.json"));
+        settings = FastJson.Deserialize<StruggleTweaksSettings>(opts);
+        settings.AddToModSettings("Struggle Tweaks");
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/chance_to_kill_wolf_after_struggle"), out chanceToKillWolfAfterStruggle))
-        {
-            Debug.LogFormat("StruggleTweaks: missing/invalid 'chance_to_kill_wolf_after_struggle' entry");
-            chanceToKillWolfAfterStruggle = 100f;
-        }
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/wolf_bleedout_minutes"), out wolfBleedoutMinutes))
-        {
-            Debug.LogFormat("StruggleTweaks: missing/invalid 'wolf_bleedout_minutes' entry");
-            wolfBleedoutMinutes = 1f;
-        }
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/tap_increment"), out tapIncrement))
-        {
-            Debug.LogFormat("StruggleTweaks: missing/invalid 'tap_increment' entry");
-            tapIncrement = 1f;
-        }
+        chanceToKillWolfAfterStruggle = settings.chanceToKillWolfAfterStruggle;
+        wolfBleedoutMinutes = settings.wolfBleedoutMinutes;
+        tapIncrement = settings.tapIncrement;
     }
 
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
 
-        return true;
-    }
-
-    [HarmonyPatch(typeof(PlayerStruggle), "Tap")]
+    [HarmonyPatch(typeof(PlayerStruggle), "WolfTap")]
     public class StruggleTweaksTap
     {
         public static void Postfix(PlayerStruggle __instance)

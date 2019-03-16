@@ -1,54 +1,54 @@
-﻿using System.Xml;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
 
 static class WeaponCrosshair
 {
-    static string configFileName = "WeaponCrosshair.xml";
     static bool stoneCrosshair = false;
     static bool rifleCrosshair = false;
     static bool bowCrosshair = false;
+
+    internal class WeaponCrosshairSettings : ModSettingsBase
+    {
+        [Name("Stone crosshair")]
+        [Description("Default value is false")]
+        public bool stoneCrosshair = true;
+
+        [Name("Rifle crosshair")]
+        [Description("Default value is false")]
+        public bool rifleCrosshair = false;
+
+        [Name("Bow crosshair")]
+        [Description("Default value is false")]
+        public bool bowCrosshair = false;
+
+        protected override void OnConfirm()
+        {
+            WeaponCrosshair.stoneCrosshair = stoneCrosshair;
+            WeaponCrosshair.rifleCrosshair = rifleCrosshair;
+            WeaponCrosshair.bowCrosshair = bowCrosshair;
+
+            string settings = FastJson.Serialize(this);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "WeaponCrosshair.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("WeaponCrosshair: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        WeaponCrosshairSettings settings = new WeaponCrosshairSettings();
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "WeaponCrosshair.json"));
+        settings = FastJson.Deserialize<WeaponCrosshairSettings>(opts);
+        settings.AddToModSettings("Weapon Crosshair");
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
-
-        if (!GetNodeBool(xml.SelectSingleNode("/config/stone_crosshair"), out stoneCrosshair))
-        {
-            Debug.LogFormat("WeaponCrosshair: missing/invalid 'stone_crosshair' entry");
-            stoneCrosshair = false;
-        }
-        if (!GetNodeBool(xml.SelectSingleNode("/config/rifle_crosshair"), out rifleCrosshair))
-        {
-            Debug.LogFormat("WeaponCrosshair: missing/invalid 'rifle_crosshair' entry");
-            rifleCrosshair = false;
-        }
-        if (!GetNodeBool(xml.SelectSingleNode("/config/bow_crosshair"), out bowCrosshair))
-        {
-            Debug.LogFormat("WeaponCrosshair: missing/invalid 'bow_crosshair' entry");
-            bowCrosshair = false;
-        }
+        stoneCrosshair = settings.stoneCrosshair;
+        rifleCrosshair = settings.rifleCrosshair;
+        bowCrosshair = settings.bowCrosshair;
     }
-
-    static private bool GetNodeBool(XmlNode node, out bool value)
-    {
-        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = false;
-            return false;
-        }
-
-        return true;
-    }
-
+    
     [HarmonyPatch(typeof(HUDManager), "UpdateCrosshair")]
     public class WeaponCrosshairUpdate
     {

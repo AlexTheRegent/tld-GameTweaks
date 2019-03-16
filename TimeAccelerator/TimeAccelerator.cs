@@ -1,86 +1,55 @@
 ﻿using System;
-using System.Xml;
 using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
 
 static class TimeAccelerator
 {
-    static string configFileName = "TimeAccelerator.xml";
-    static string accelerationKey = "V";
+    static KeyCode accelerationKey = KeyCode.V;
     static float accelerationValue = 3.0f;
     static bool holdToAccelerate = false;
     static bool accelerated = false;
-    static KeyCode accelerationKeyCode = KeyCode.V;
+
+    internal class TimeAcceleratorSettings : ModSettingsBase
+    {
+        [Name("Acceleration key")]
+        [Choice("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")]
+        public int accelerationKey = 2;
+
+        [Name("Acceleration behaviour")]
+        [Choice("Hold to accelerate", "Toggle on press")]
+        public int accelerationBehaviour = 0;
+
+        [Name("Acceleration speed")]
+        [Description("1 = 100%, 2 = 200%")]
+        [Slider(0f, 10f, 101)]
+        public float accelerationValue = 3f;
+
+        protected override void OnConfirm()
+        {
+            TimeAccelerator.accelerationKey = KeyCode.A + accelerationKey;
+            TimeAccelerator.holdToAccelerate = accelerationBehaviour==0;
+            TimeAccelerator.accelerationValue = accelerationValue;
+
+            string settings = FastJson.Serialize(this);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TimeAccelerator.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("TimeAccelerator: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
-
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/acceleration_value"), out accelerationValue))
-        {
-            Debug.LogFormat("TimeAccelerator: missing/invalid 'acceleration_value' entry");
-            accelerationValue = 5.0f;
-        }
-
-        if (!GetNodeString(xml.SelectSingleNode("/config/acceleration_key"), out accelerationKey))
-        {
-            Debug.LogFormat("TimeAccelerator: missing/invalid 'acceleration_key' entry");
-            accelerationKey = "E";
-        }
-
-        accelerationKeyCode = (KeyCode)Enum.Parse(typeof(KeyCode), accelerationKey);
-        if (!Enum.IsDefined(typeof(KeyCode), accelerationKeyCode) && !accelerationKeyCode.ToString().Contains(","))
-        {
-            Debug.LogFormat("TimeAccelerator: invalid key for 'acceleration_key' entry");
-            accelerationKeyCode = KeyCode.V;
-        }
-
-        if (!GetNodeBool(xml.SelectSingleNode("/config/hold_to_accelerate"), out holdToAccelerate))
-        {
-            Debug.LogFormat("TimeAccelerator: missing/invalid 'hold_to_accelerate' entry");
-            holdToAccelerate = true;
-        }
-    }
-
-    static private bool GetNodeString(XmlNode node, out string value)
-    {
-        if (node == null || node.Attributes["value"] == null)
-        {
-            value = "V";
-            return false;
-        }
-
-        value = node.Attributes["value"].Value;
-        return true;
-    }
-
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
-
-        return true;
-    }
-    static private bool GetNodeBool(XmlNode node, out bool value)
-    {
-        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = false;
-            return false;
-        }
-
-        return true;
+        TimeAcceleratorSettings settings = new TimeAcceleratorSettings();
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TimeAccelerator.json"));
+        settings = FastJson.Deserialize<TimeAcceleratorSettings>(opts);
+        settings.AddToModSettings("Time Accelerator");
+        
+        accelerationKey = KeyCode.A + settings.accelerationKey;
+        holdToAccelerate = settings.accelerationBehaviour == 0;
+        accelerationValue = settings.accelerationValue;
     }
 
     [HarmonyPatch(typeof(InterfaceManager), "Update")]
@@ -90,21 +59,21 @@ static class TimeAccelerator
         {
             if (holdToAccelerate)
             {
-                if (Input.GetKey(accelerationKeyCode))
+                if (Input.GetKey(accelerationKey))
                 {
                     if (Time.timeScale < accelerationValue)
                     {
                         Time.timeScale = accelerationValue;
                     }
                 }
-                else if (Input.GetKeyUp(accelerationKeyCode))
+                else if (Input.GetKeyUp(accelerationKey))
                 {
                     Time.timeScale = 1.0f;
                 }
             }
             else
             {
-                if (Input.GetKeyDown(accelerationKeyCode))
+                if (Input.GetKeyDown(accelerationKey))
                 {
                     accelerated = !accelerated;
                 }

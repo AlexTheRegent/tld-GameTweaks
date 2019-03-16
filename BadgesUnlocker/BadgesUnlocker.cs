@@ -289,7 +289,7 @@ static class BadgesUnlocker
     static public void OnLoad()
     {
         BadgesUnlockerSettings settings = new BadgesUnlockerSettings();
-        settings.AddToModSettings("Badges Unlocker");
+        settings.AddToModSettings("Badges Unlocker", MenuType.MainMenuOnly);
 
         FieldInfo[] fields = settings.GetType().GetFields();
         settings.SetFieldVisible(fields[1], false);

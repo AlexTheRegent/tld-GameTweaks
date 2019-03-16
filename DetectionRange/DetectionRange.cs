@@ -1,111 +1,472 @@
-﻿using System.Xml;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using System.Collections.Generic;
+using ModSettings;
 
 static class DetectionRange
 {
-    private enum AnimalType
+    struct AnimalRanges
     {
-        WOLF = 0,
-        DEER = 1,
-        RABBIT = 2,
-        BEAR = 3,
-        MOOSE = 4,
-        TOTAL = 5,
-    }
+        public bool enabled;  
+        public float smell_range;
 
-    // Configuration 
-    static string configFileName = "DetectionRange.xml";
-    struct xml_parameters
-    {
         public float hear_range;
         public float hear_range_while_feeding;
-        public float smell_range;
+
         public float detection_range;
         public float detection_range_while_feeding;
+    };
+
+    static Dictionary<string, AnimalRanges> m_animals = new Dictionary<string, AnimalRanges>();
+
+    class WolfRangesSettings : ModSettingsBase
+    {
+        [Section("Wolf")]
+
+        [Name("Enable override")]
+        [Description("Default value is no")]
+        public bool enabled = false;  
+
+        [Name("Smell range")]
+        [Description("Default value is 100 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float smell_range = 100f;
+
+        [Name("Hear range")]
+        [Description("Default value is 75 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range = 75f;
+        [Name("Hear range while feeding")]
+        [Description("Default value is 20 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range_while_feeding = 20f;
+
+        [Name("Detection range")]
+        [Description("Default value is 60 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range = 60f;
+        [Name("Detection range while feeding")]
+        [Description("Default value is 25 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range_while_feeding = 25f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+                this.SetFieldVisible(fields[4], (bool)newValue);
+                this.SetFieldVisible(fields[5], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            DetectionRange.m_animals["wolf"] = GetSettings();
+
+            string settings = FastJson.Serialize(m_animals);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"), settings);
+        }
+
+        public AnimalRanges GetSettings()
+        {
+            return new AnimalRanges
+            {
+                enabled = enabled,
+                smell_range = smell_range,
+                hear_range = hear_range,
+                hear_range_while_feeding = hear_range_while_feeding,
+                detection_range = detection_range,
+                detection_range_while_feeding = detection_range_while_feeding
+            };
+        }
+
+        public void SetSettings(AnimalRanges ranges)
+        {
+            enabled = ranges.enabled;
+            smell_range = ranges.smell_range;
+            hear_range = ranges.hear_range;
+            hear_range_while_feeding = ranges.hear_range_while_feeding;
+            detection_range = ranges.detection_range;
+            detection_range_while_feeding = ranges.detection_range_while_feeding;
+        }
     }
 
-    static xml_parameters[] config = new xml_parameters[(int)AnimalType.TOTAL];
+    class DeerRangesSettings : ModSettingsBase
+    {
+        [Section("Deer")]
+
+        [Name("Enable override")]
+        [Description("Default value is no")]
+        public bool enabled = false;
+
+        [Name("Smell range")]
+        [Description("Default value is 0 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float smell_range = 0f;
+
+        [Name("Hear range")]
+        [Description("Default value is 40 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range = 40f;
+        [Name("Hear range while feeding")]
+        [Description("Default value is 30 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range_while_feeding = 30f;
+
+        [Name("Detection range")]
+        [Description("Default value is 60 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range = 60f;
+        [Name("Detection range while feeding")]
+        [Description("Default value is 20 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range_while_feeding = 20f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+                this.SetFieldVisible(fields[4], (bool)newValue);
+                this.SetFieldVisible(fields[5], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            DetectionRange.m_animals["deer"] = GetSettings();
+
+            string settings = FastJson.Serialize(m_animals);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"), settings);
+        }
+
+        public AnimalRanges GetSettings()
+        {
+            return new AnimalRanges
+            {
+                enabled = enabled,
+                smell_range = smell_range,
+                hear_range = hear_range,
+                hear_range_while_feeding = hear_range_while_feeding,
+                detection_range = detection_range,
+                detection_range_while_feeding = detection_range_while_feeding
+            };
+        }
+
+        public void SetSettings(AnimalRanges ranges)
+        {
+            enabled = ranges.enabled;
+            smell_range = ranges.smell_range;
+            hear_range = ranges.hear_range;
+            hear_range_while_feeding = ranges.hear_range_while_feeding;
+            detection_range = ranges.detection_range;
+            detection_range_while_feeding = ranges.detection_range_while_feeding;
+        }
+    }
+
+    class MooseRangesSettings : ModSettingsBase
+    {
+        [Section("Moose")]
+
+        [Name("Enable override")]
+        [Description("Default value is no")]
+        public bool enabled = false;  
+
+        [Name("Smell range")]
+        [Description("Default value is 0 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float smell_range = 0f;
+
+        [Name("Hear range")]
+        [Description("Default value is 50 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range = 50f;
+        [Name("Hear range while feeding")]
+        [Description("Default value is 30 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range_while_feeding = 30f;
+
+        [Name("Detection range")]
+        [Description("Default value is 60 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range = 60f;
+        [Name("Detection range while feeding")]
+        [Description("Default value is 20 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range_while_feeding = 20f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+                this.SetFieldVisible(fields[4], (bool)newValue);
+                this.SetFieldVisible(fields[5], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            DetectionRange.m_animals["moose"] = GetSettings();
+
+            string settings = FastJson.Serialize(m_animals);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"), settings);
+        }
+
+        public AnimalRanges GetSettings()
+        {
+            return new AnimalRanges
+            {
+                enabled = enabled,
+                smell_range = smell_range,
+                hear_range = hear_range,
+                hear_range_while_feeding = hear_range_while_feeding,
+                detection_range = detection_range,
+                detection_range_while_feeding = detection_range_while_feeding
+            };
+        }
+
+        public void SetSettings(AnimalRanges ranges)
+        {
+            enabled = ranges.enabled;
+            smell_range = ranges.smell_range;
+            hear_range = ranges.hear_range;
+            hear_range_while_feeding = ranges.hear_range_while_feeding;
+            detection_range = ranges.detection_range;
+            detection_range_while_feeding = ranges.detection_range_while_feeding;
+        }
+    }
+
+    class RabbitRangesSettings : ModSettingsBase
+    {
+        [Section("Rabbit")]
+
+        [Name("Enable override")]
+        [Description("Default value is no")]
+        public bool enabled = false;  
+
+        [Name("Smell range")]
+        [Description("Default value is 0 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float smell_range = 0f;
+
+        [Name("Hear range")]
+        [Description("Default value is 12 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range = 12f;
+        [Name("Hear range while feeding")]
+        [Description("Default value is 30 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range_while_feeding = 30f;
+
+        [Name("Detection range")]
+        [Description("Default value is 7 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range = 7f;
+        [Name("Detection range while feeding")]
+        [Description("Default value is 5 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range_while_feeding = 5f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+                this.SetFieldVisible(fields[4], (bool)newValue);
+                this.SetFieldVisible(fields[5], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            DetectionRange.m_animals["rabbit"] = GetSettings();
+
+            string settings = FastJson.Serialize(m_animals);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"), settings);
+        }
+
+        public AnimalRanges GetSettings()
+        {
+            return new AnimalRanges
+            {
+                enabled = enabled,
+                smell_range = smell_range,
+                hear_range = hear_range,
+                hear_range_while_feeding = hear_range_while_feeding,
+                detection_range = detection_range,
+                detection_range_while_feeding = detection_range_while_feeding
+            };
+        }
+
+        public void SetSettings(AnimalRanges ranges)
+        {
+            enabled = ranges.enabled;
+            smell_range = ranges.smell_range;
+            hear_range = ranges.hear_range;
+            hear_range_while_feeding = ranges.hear_range_while_feeding;
+            detection_range = ranges.detection_range;
+            detection_range_while_feeding = ranges.detection_range_while_feeding;
+        }
+    }
+
+    class BearRangesSettings : ModSettingsBase
+    {
+        [Section("Bear")]
+
+        [Name("Enable override")]
+        [Description("Default value is no")]
+        public bool enabled = false;  
+
+        [Name("Smell range")]
+        [Description("Default value is 150 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float smell_range = 150f;
+
+        [Name("Hear range")]
+        [Description("Default value is 60 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range = 60f;
+        [Name("Hear range while feeding")]
+        [Description("Default value is 15 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float hear_range_while_feeding = 15f;
+
+        [Name("Detection range")]
+        [Description("Default value is 60 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range = 60f;
+        [Name("Detection range while feeding")]
+        [Description("Default value is 25 (as of February 09'th, 2019)")]
+        [Slider(0f, 500f, 501)]
+        public float detection_range_while_feeding = 25f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+                this.SetFieldVisible(fields[4], (bool)newValue);
+                this.SetFieldVisible(fields[5], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            DetectionRange.m_animals["bear"] = GetSettings();
+
+            string settings = FastJson.Serialize(m_animals);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"), settings);
+        }
+
+        public AnimalRanges GetSettings()
+        {
+            return new AnimalRanges
+            {
+                enabled = enabled,
+                smell_range = smell_range,
+                hear_range = hear_range,
+                hear_range_while_feeding = hear_range_while_feeding,
+                detection_range = detection_range,
+                detection_range_while_feeding = detection_range_while_feeding
+            };
+        }
+
+        public void SetSettings(AnimalRanges ranges)
+        {
+            enabled = ranges.enabled;
+            smell_range = ranges.smell_range;
+            hear_range = ranges.hear_range;
+            hear_range_while_feeding = ranges.hear_range_while_feeding;
+            detection_range = ranges.detection_range;
+            detection_range_while_feeding = ranges.detection_range_while_feeding;
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("DetectionRange: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DetectionRange.json"));
+        Dictionary<string, AnimalRanges> settings = FastJson.Deserialize<Dictionary<string, AnimalRanges>>(opts);
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
+        WolfRangesSettings wolves = new WolfRangesSettings();
+        if (!settings.ContainsKey("wolf"))
+        {
+            settings["wolf"] = GetEmptyStructure();
+        }
+        wolves.SetSettings(settings["wolf"]);
+        wolves.AddToModSettings("Detection Range");
+        m_animals.Add("wolf", wolves.GetSettings());
 
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/rabbits")[0], (int)AnimalType.RABBIT);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/wolves")[0], (int)AnimalType.WOLF);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/mooses")[0], (int)AnimalType.MOOSE);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/deers")[0], (int)AnimalType.DEER);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/bears")[0], (int)AnimalType.BEAR);
+        DeerRangesSettings deers = new DeerRangesSettings();
+        if (!settings.ContainsKey("deer"))
+        {
+            settings["deer"] = GetEmptyStructure();
+        }
+        deers.SetSettings(settings["deer"]);
+        deers.AddToModSettings("Detection Range");
+        m_animals.Add("deer", deers.GetSettings());
+
+        MooseRangesSettings mooses = new MooseRangesSettings();
+        if (!settings.ContainsKey("moose"))
+        {
+            settings["moose"] = GetEmptyStructure();
+        }
+        mooses.SetSettings(settings["moose"]);
+        mooses.AddToModSettings("Detection Range");
+        m_animals.Add("moose", mooses.GetSettings());
+
+        RabbitRangesSettings rabbits = new RabbitRangesSettings();
+        if (!settings.ContainsKey("rabbit"))
+        {
+            settings["rabbit"] = GetEmptyStructure();
+        }
+        rabbits.SetSettings(settings["rabbit"]);
+        rabbits.AddToModSettings("Detection Range");
+        m_animals.Add("rabbit", rabbits.GetSettings());
+
+        BearRangesSettings bears = new BearRangesSettings();
+        if (!settings.ContainsKey("bear"))
+        {
+            settings["bear"] = GetEmptyStructure();
+        }
+        bears.SetSettings(settings["bear"]);
+        bears.AddToModSettings("Detection Range");
+        m_animals.Add("bear", bears.GetSettings());
     }
 
-    static void parse_xml_node(XmlNode node, int idx)
+    static AnimalRanges GetEmptyStructure()
     {
-        if (!GetNodeFloat(node.SelectSingleNode("hear_range"), out config[idx].hear_range))
+        return new AnimalRanges
         {
-            Debug.LogFormat("DetectionRange: missing 'hear_range' entry for '{0}' section", get_animal_name(idx));
-            config[idx].hear_range = -1f;
-        }
-        if (!GetNodeFloat(node.SelectSingleNode("hear_range_while_feeding"), out config[idx].hear_range_while_feeding))
-        {
-            Debug.LogFormat("DetectionRange: missing 'hear_range_while_feeding' entry for '{0}' section", get_animal_name(idx));
-            config[idx].hear_range_while_feeding = -1f;
-        }
-        if (!GetNodeFloat(node.SelectSingleNode("smell_range"), out config[idx].smell_range))
-        {
-            Debug.LogFormat("DetectionRange: missing 'smell_range' entry for '{0}' section", get_animal_name(idx));
-            config[idx].smell_range = -1f;
-        }
-        if (!GetNodeFloat(node.SelectSingleNode("detection_range"), out config[idx].detection_range))
-        {
-            Debug.LogFormat("DetectionRange: missing 'detection_range' entry for '{0}' section", get_animal_name(idx));
-            config[idx].detection_range = -1f;
-        }
-        if (!GetNodeFloat(node.SelectSingleNode("detection_range_while_feeding"), out config[idx].detection_range_while_feeding))
-        {
-            Debug.LogFormat("DetectionRange: missing 'detection_range_while_feeding' entry for '{0}' section", get_animal_name(idx));
-            config[idx].detection_range_while_feeding = -1f;
-        }
+            enabled = false,
+            smell_range = 0f,
+            hear_range = 0f,
+            hear_range_while_feeding = 0f,
+            detection_range = 0f,
+            detection_range_while_feeding = 0f
+        };
     }
 
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
-
-        return true;
-    }
-
-    static string get_animal_name(int idx)
-    {
-        switch (idx)
-        {
-            case (int)AnimalType.WOLF:
-                return "wolves";
-            case (int)AnimalType.RABBIT:
-                return "rabbits";
-            case (int)AnimalType.MOOSE:
-                return "mooses";
-            case (int)AnimalType.BEAR:
-                return "bears";
-            case (int)AnimalType.DEER:
-                return "deers";
-        }
-
-        return "unknown section";
-    }
-
-    // Modify values 
     [HarmonyPatch(typeof(BaseAi), "DoCustomModeModifiers")]
     public class DetectionRangeModify
     {
@@ -114,40 +475,44 @@ static class DetectionRange
             switch (__instance.m_AiSubType)
             {
                 case AiSubType.Wolf:
-                    adjust_ranges(__instance, (int)AnimalType.WOLF);
+                    AdjustRanges(__instance, "wolf");
                     break;
                 case AiSubType.Stag:
-                    adjust_ranges(__instance, (int)AnimalType.DEER);
+                    AdjustRanges(__instance, "deer");
                     break;
                 case AiSubType.Moose:
-                    adjust_ranges(__instance, (int)AnimalType.MOOSE);
+                    AdjustRanges(__instance, "moose");
                     break;
                 case AiSubType.Rabbit:
-                    adjust_ranges(__instance, (int)AnimalType.RABBIT);
+                    AdjustRanges(__instance, "rabbit");
                     break;
                 case AiSubType.Bear:
-                    adjust_ranges(__instance, (int)AnimalType.BEAR);
+                    AdjustRanges(__instance, "bear");
                     break;
             }
-            
+
         }
     }
 
-    static void adjust_ranges(BaseAi inst, int idx)
+    static void AdjustRanges(BaseAi inst, string animal)
     {
-        if (config[idx].hear_range_while_feeding >= 0f)
-            inst.m_HearFootstepsRangeWhileFeeding = config[idx].hear_range_while_feeding;
+        // Debug.LogFormat("{0} {1} {2} {3} {4} {5}", animal, inst.m_SmellRange, inst.m_DetectionRange, inst.m_DetectionRangeWhileFeeding, inst.m_HearFootstepsRange, inst.m_HearFootstepsRangeWhileFeeding);
+        if (m_animals[animal].enabled)
+        {
+            if (m_animals[animal].hear_range_while_feeding >= 0f)
+                inst.m_HearFootstepsRangeWhileFeeding = m_animals[animal].hear_range_while_feeding;
 
-        if (config[idx].hear_range >= 0f)
-            inst.m_HearFootstepsRange = config[idx].hear_range;
+            if (m_animals[animal].hear_range >= 0f)
+                inst.m_HearFootstepsRange = m_animals[animal].hear_range;
 
-        if (config[idx].detection_range_while_feeding >= 0f)
-            inst.m_DetectionRangeWhileFeeding = config[idx].detection_range_while_feeding;
+            if (m_animals[animal].detection_range_while_feeding >= 0f)
+                inst.m_DetectionRangeWhileFeeding = m_animals[animal].detection_range_while_feeding;
 
-        if (config[idx].detection_range >= 0f)
-            inst.m_DetectionRange = config[idx].detection_range;
+            if (m_animals[animal].detection_range >= 0f)
+                inst.m_DetectionRange = m_animals[animal].detection_range;
 
-        if (config[idx].smell_range >= 0f)
-            inst.m_SmellRange = config[idx].smell_range;
+            if (m_animals[animal].smell_range >= 0f)
+                inst.m_SmellRange = m_animals[animal].smell_range;
+        }
     }
 }

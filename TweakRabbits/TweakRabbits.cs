@@ -1,58 +1,54 @@
-﻿using System.Xml;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
 
 static class TweakRabbits
 {
-    static string configFileName = "TweakRabbits.xml";
-    static float stunDuration = -1f;
-    static bool killOnHit = true;
+    static bool killOnHit = false;
+    static float stunDuration = 4f;
+
+    internal class TweakRabbitsSettings : ModSettingsBase
+    {
+        [Name("Kill rabbit on stone hit")]
+        public bool killOnHit = false;
+
+        [Name("Stun duration, seconds")]
+        [Description("Default value is 4 (as of October 29'th, 2018)")]
+        [Slider(1, 300)]
+        public int stunDuration = 4;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "killOnHit")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], !(bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            TweakRabbits.killOnHit = killOnHit;
+            TweakRabbits.stunDuration = stunDuration;
+
+            string settings = FastJson.Serialize(this);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TweakRabbits.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("TweakRabbits: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        TweakRabbitsSettings settings = new TweakRabbitsSettings();
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TweakRabbits.json"));
+        settings = FastJson.Deserialize<TweakRabbitsSettings>(opts);
+        settings.AddToModSettings("Tweak Rabbits");
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/stun_duration"), out stunDuration))
-        {
-            Debug.LogFormat("TweakRabbits: missing/invalid 'stun_duration' entry");
-            stunDuration = -1f;
-        }
-
-        if (!GetNodeBool(xml.SelectSingleNode("/config/kill_on_hit"), out killOnHit))
-        {
-            Debug.LogFormat("TweakRabbits: missing/invalid 'kill_on_hit' entry");
-            killOnHit = true;
-        }
-    }
-
-    static private bool GetNodeBool(XmlNode node, out bool value)
-    {
-        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
-
-        return true;
+        killOnHit = settings.killOnHit;
+        stunDuration = settings.stunDuration;
     }
 
     [HarmonyPatch(typeof(BaseAi), "EnterStunned")]
@@ -60,14 +56,25 @@ static class TweakRabbits
     {
         public static void Prefix(BaseAi __instance)
         {
-            if (stunDuration >= 0f)
-                __instance.m_StunSeconds = stunDuration;
+            if (__instance.m_AiRabbit != null)
+            {
+                if (stunDuration >= 0f)
+                {
+                    Debug.LogFormat("TweakRabbits: stun duration {0}", __instance.m_StunSeconds);
+                    __instance.m_StunSeconds = stunDuration;
+                }
+            }
         }
 
         public static void Postfix(BaseAi __instance)
         {
-            if (killOnHit)
-                __instance.EnterDead();
+            if (__instance.m_AiRabbit != null)
+            {
+                if (killOnHit)
+                {
+                    __instance.EnterDead();
+                }
+            }
         }
     }
 }

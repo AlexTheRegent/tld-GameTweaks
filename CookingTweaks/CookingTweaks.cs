@@ -4,271 +4,228 @@ using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
+using System.Collections.Generic;
+using System.Linq;
 
 static class CookingTweaks
 {
-
-    private enum FoodType
+    internal struct BoilingTime
     {
-        BEAR,
-        RABBIT,
-        SALMON,
-        WHITEFISH,
-        RAINBOWTROUT,
-        BASS,
-        DEER,
-        WOLF,
-        PEACHES,
-        BEANS,
-        TOMATOSOUP,
-        REISHITEA,
-        ROSETEA,
-        COFFEE,
-        COFFEETIN,
-        TEA,
-        TEAPACKAGE,
-        TOTAL,
+        public bool enabled;
+        public float melting;
+        public float boiling;
+        public float drying;
     }
 
-    struct xml_parameters
+    internal static BoilingTime m_water;
+    internal static Dictionary<string, CookingTime> m_food = new Dictionary<string, CookingTime>();
+
+    internal struct SaveDataProxy
     {
-        public float cookingTime;
-        public float readyTime;
+        public BoilingTime water;
+        public Dictionary<string, CookingTime> food;
     }
 
-    static string configFileName = "CookingTweaks.xml";
-    static xml_parameters[] config = new xml_parameters[(int)FoodType.TOTAL];
+    internal class WaterSettings : ModSettingsBase
+    {
+        [Section("Water")]
 
-    static float meltingTime;
-    static float boilingTime;
-    static float dryingTime;
+        [Name("Enable override")]
+        public bool enabled = false;
+
+        [Name("Ice melting time")]
+        [Description("ingame minutes, per 1 unit")]
+        [Slider(0f, 600f, 601)]
+        public float melting = 0f;
+
+        [Name("Water boiling time")]
+        [Description("ingame minutes, per 1 unit")]
+        [Slider(0f, 600f, 601)]
+        public float boiling = 0f;
+
+        [Name("Water drying time")]
+        [Description("ingame minutes, per 1 unit")]
+        [Slider(0f, 600f, 601)]
+        public float drying = 0f;
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[1], (bool)newValue);
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+            }
+        }
+
+        protected override void OnConfirm()
+        {
+            m_water.enabled = enabled;
+            m_water.melting = melting;
+            m_water.boiling = boiling;
+            m_water.drying = drying;
+
+            SaveDataProxy data = new SaveDataProxy
+            {
+                water = m_water,
+                food = m_food
+            };
+
+            string settings = FastJson.Serialize(data);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CookingTweaks.json"), settings);
+        }
+    }
+
+    internal struct CookingTime
+    {
+        public string name;
+        public bool enabled;
+        public float cooking;
+        public float burning;
+    }
+
+    internal class FoodSettings : ModSettingsBase
+    {
+        [Section("Food")]
+
+        [Name("Edit")]
+        public string foodType;
+
+        [Name("Enable override")]
+        public bool enabled = false;
+
+        [Name("Cooking time")]
+        [Description("ingame minutes, per 1 unit")]
+        [Slider(0f, 600f, 601)]
+        public float cooking = 0f;
+
+        [Name("Burning time")]
+        [Description("ingame minutes, per 1 unit")]
+        [Slider(0f, 600f, 601)]
+        public float burning = 0f;
+
+        internal string lastFood;
+        internal static Dictionary<string, CookingTime> m_changes = new Dictionary<string, CookingTime>();
+
+        public FoodSettings(string foodName)
+        {
+            lastFood = foodName;
+        }
+
+        protected override void OnChange(FieldInfo field, object oldValue, object newValue)
+        {
+            if (field.Name == "foodType")
+            {
+                CookingTime foodData;
+                foodType = (string)newValue;
+                if (m_changes.ContainsKey(foodType))
+                {
+                    foodData = m_changes[foodType];
+                }
+                else if (m_food.ContainsKey(foodType))
+                {
+                    foodData = m_food[foodType];
+                }
+                else
+                {
+                    foodData = GetEmptyStructure();
+                }
+
+                m_changes[lastFood] = new CookingTime
+                {
+                    name = "",
+                    enabled = enabled,
+                    cooking = cooking,
+                    burning = burning,
+                };
+
+                enabled = foodData.enabled;
+                cooking = foodData.cooking;
+                burning = foodData.burning;
+                lastFood = foodType;
+                RefreshGUI();
+            }
+            else if (field.Name == "enabled")
+            {
+                FieldInfo[] fields = GetType().GetFields();
+                this.SetFieldVisible(fields[2], (bool)newValue);
+                this.SetFieldVisible(fields[3], (bool)newValue);
+            }
+        }
+        protected override void OnConfirm()
+        {
+            string food = foodType.ToString();
+            m_changes[food] = new CookingTime
+            {
+                name = "",
+                enabled = enabled,
+                cooking = cooking,
+                burning = burning,
+            };
+            m_changes.ToList().ForEach(delegate(KeyValuePair<string, CookingTime> x)
+            {
+                m_food[x.Key] = new CookingTime
+                {
+                    name = m_food[x.Key].name,
+                    enabled = x.Value.enabled,
+                    cooking = x.Value.cooking,
+                    burning = x.Value.burning,
+                }; ;
+            });
+            SaveDataProxy data = new SaveDataProxy
+            {
+                water = m_water,
+                food = m_food
+            };
+
+            string settings = FastJson.Serialize(data);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CookingTweaks.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("CookingTweaks: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        string settings = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CookingTweaks.json"));
+        SaveDataProxy data = FastJson.Deserialize<SaveDataProxy>(settings);
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
+        WaterSettings waterSettings = new WaterSettings();
+        FoodSettings foodSettings = new FoodSettings(data.food.ElementAt(0).Key);
 
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/bear")[0], (int)FoodType.BEAR);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/rabbit")[0], (int)FoodType.RABBIT);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/salmon")[0], (int)FoodType.SALMON);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/whitefish")[0], (int)FoodType.WHITEFISH);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/rainbowtrout")[0], (int)FoodType.RAINBOWTROUT);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/bass")[0], (int)FoodType.BASS);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/deer")[0], (int)FoodType.DEER);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/wolf")[0], (int)FoodType.WOLF);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/peaches")[0], (int)FoodType.PEACHES);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/beans")[0], (int)FoodType.BEANS);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/tomatosoup")[0], (int)FoodType.TOMATOSOUP);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/reishitea")[0], (int)FoodType.REISHITEA);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/rosetea")[0], (int)FoodType.ROSETEA);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/coffee")[0], (int)FoodType.COFFEE);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/coffeetin")[0], (int)FoodType.COFFEETIN);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/tea")[0], (int)FoodType.TEA);
-        parse_xml_node(xml.DocumentElement.SelectNodes("/config/teapackage")[0], (int)FoodType.TEAPACKAGE);
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/water/melting"), out meltingTime))
-        {
-            Debug.LogFormat("CookingTweaks: missing/invalid 'melting' entry");
-            meltingTime = -1f;
-        }
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/water/boiling"), out boilingTime))
-        {
-            Debug.LogFormat("CookingTweaks: missing/invalid 'boiling' entry");
-            boilingTime = -1f;
-        }
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/water/drying"), out dryingTime))
-        {
-            Debug.LogFormat("CookingTweaks: missing/invalid 'drying' entry");
-            dryingTime = -1f;
-        }
+        // m_water = data.water;
+        // m_food = data.food;
+        // 
+        // waterSettings.enabled = m_water.enabled;
+        // waterSettings.melting = m_water.melting;
+        // waterSettings.boiling = m_water.boiling;
+        // waterSettings.drying = m_water.drying;
+        // 
+        // string firstFood = ((FoodTypes)0).ToString();
+        // foodSettings.foodType = 0;
+        // if (!m_food.ContainsKey(firstFood))
+        // {
+        //     m_food[((FoodTypes)0).ToString()] = GetEmptyStructure();
+        // }
+        // 
+        // foodSettings.enabled = m_food[firstFood].enabled;
+        // foodSettings.cooking = m_food[firstFood].cooking;
+        // foodSettings.burning = m_food[firstFood].burning;
+        // 
+        // waterSettings.AddToModSettings("Cooking Tweaks");
+        // foodSettings.AddToModSettings("Cooking Tweaks");
     }
 
-    static void parse_xml_node(XmlNode node, int idx)
+    static CookingTime GetEmptyStructure()
     {
-        if (!GetNodeFloat(node.SelectSingleNode("cooking_time"), out config[idx].cookingTime))
+        return new CookingTime
         {
-            Debug.LogFormat("CookingTweaks: missing 'cooking_time' entry for '{0}' section", GetFoodName(idx));
-            config[idx].cookingTime = -1f;
-        }
-        if (!GetNodeFloat(node.SelectSingleNode("ready_time"), out config[idx].readyTime))
-        {
-            Debug.LogFormat("CookingTweaks: missing 'ready_time' entry for '{0}' section", GetFoodName(idx));
-            config[idx].readyTime = -1f;
-        }
-    }
-
-    static private string GetFoodName(int idx)
-    {
-        switch (idx)
-        {
-            case (int)FoodType.BEAR:
-                return "bear";
-            case (int)FoodType.RABBIT:
-                return "rabbit";
-            case (int)FoodType.SALMON:
-                return "salmon";
-            case (int)FoodType.WHITEFISH:
-                return "whitefish";
-            case (int)FoodType.RAINBOWTROUT:
-                return "rainbowtrout";
-            case (int)FoodType.BASS:
-                return "bass";
-            case (int)FoodType.DEER:
-                return "deer";
-            case (int)FoodType.WOLF:
-                return "wolf";
-            case (int)FoodType.PEACHES:
-                return "peaches";
-            case (int)FoodType.BEANS:
-                return "beans";
-            case (int)FoodType.TOMATOSOUP:
-                return "tomatosoup";
-            case (int)FoodType.REISHITEA:
-                return "reishitea";
-            case (int)FoodType.ROSETEA:
-                return "rosetea";
-            case (int)FoodType.COFFEE:
-                return "coffee";
-            case (int)FoodType.COFFEETIN:
-                return "coffee";
-            case (int)FoodType.TEA:
-                return "tea";
-            case (int)FoodType.TEAPACKAGE:
-                return "tea";
-        }
-
-        return string.Empty;
-    }
-
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
-
-        return true;
-    }
-
-    static private bool GetNodeBool(XmlNode node, out bool value)
-    {
-        if (node == null || node.Attributes["value"] == null || !bool.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    [HarmonyPatch(typeof(CookingPotItem), "StartCooking")]
-    public class CookingTweaksCookingFood
-    { 
-        public static void Postfix(CookingPotItem __instance, GearItem gearItemToCook)
-        {
-            Debug.LogFormat("CookingTweaks: item id: \"{0}\", cooking time: \"{1}\", burning time: \"{2}\"", gearItemToCook.m_LocalizedDisplayName.m_LocalizationID, gearItemToCook.m_Cookable.m_CookTimeMinutes, gearItemToCook.m_Cookable.m_ReadyTimeMinutes);
-            switch (gearItemToCook.m_LocalizedDisplayName.m_LocalizationID)
-            {
-                case "GAMEPLAY_BearMeatRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.BEAR]);
-                    break;
-                case "GAMEPLAY_RabbitRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.RABBIT]);
-                    break;
-                case "GAMEPLAY_RawCohoSalmon":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.SALMON]);
-                    break;
-                case "GAMEPLAY_RawLakeWhiteFish":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.WHITEFISH]);
-                    break;
-                case "GAMEPLAY_RawRainbowTrout":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.RAINBOWTROUT]);
-                    break;
-                case "GAMEPLAY_RawSmallMouthBass":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.BASS]);
-                    break;
-                case "GAMEPLAY_VenisonRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.DEER]);
-                    break;
-                case "GAMEPLAY_WolfMeatRaw":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.WOLF]);
-                    break;
-                case "GAMEPLAY_PinnaclePeaches":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.PEACHES]);
-                    break;
-                case "GAMEPLAY_PorkandBeans":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.BEANS]);
-                    break;
-                case "GAMEPLAY_TomatoSoupCan":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.TOMATOSOUP]);
-                    break;
-                case "GAMEPLAY_ReishiTea":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.REISHITEA]);
-                    break;
-                case "GAMEPLAY_RoseHipTea":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.ROSETEA]);
-                    break;
-                case "GAMEPLAY_CoffeeCup":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.COFFEE]);
-                    break;
-                case "GAMEPLAY_CoffeeTin":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.COFFEETIN]);
-                    break;
-                case "GAMEPLAY_GreenTeaCup":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.TEA]);
-                    break;
-                case "GAMEPLAY_GreenTeaPackage":
-                    UpdateValues(gearItemToCook, config[(int)FoodType.TEAPACKAGE]);
-                    break;
-            }
-        }
-    }
-
-    static private void UpdateValues(GearItem gearItem, xml_parameters settings)
-    {
-        if (settings.cookingTime >= 0f)
-        {
-            gearItem.m_Cookable.m_CookTimeMinutes = settings.cookingTime * GameManager.GetSkillCooking().GetCookingTimeScale();
-        }
-        if (settings.readyTime >= 0f)
-        {
-            gearItem.m_Cookable.m_ReadyTimeMinutes = settings.readyTime;
-        }
-    }
-
-    [HarmonyPatch(typeof(CookingPotItem), "StartMeltingSnow")]
-    public class CookingTweaksMeltingSnow
-    {
-        public static void Postfix()
-        {
-            if (meltingTime >= 0f)
-            {
-                InterfaceManager.m_Panel_Cooking.m_MinutesToMeltSnowPerLiter = meltingTime;
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(CookingPotItem), "StartBoilingWater")]
-    public class CookingTweaksBoilingWater
-    {
-        public static void Postfix()
-        {
-            if (boilingTime >= 0f)
-            {
-                InterfaceManager.m_Panel_Cooking.m_MinutesToBoilWaterPerLiter = boilingTime;
-            }
-            if (dryingTime >= 0f)
-            {
-                InterfaceManager.m_Panel_Cooking.m_MinutesReadyTimeBoilingWater = dryingTime;
-            }
-        }
+            name = "",
+            enabled = false,
+            cooking = 0f,
+            burning = 0f,
+        };
     }
 }

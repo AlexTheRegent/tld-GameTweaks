@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweakRabbits", "TweakRabbits\TweakRabbits.csproj", "{304B1036-DBC4-47FA-88B5-3A7901801221}"
 EndProject
@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StruggleTweaks", "StruggleT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeAccelerator", "TimeAccelerator\TimeAccelerator.csproj", "{19FB6245-4E64-4DE6-9E6D-32EC38324F58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BleedingTweaks", "ClassLibrary1\BleedingTweaks.csproj", "{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookingTweaks", "CookingTweaks\CookingTweaks.csproj", "{EA9006CD-D178-407C-98B9-5028217BCF41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadgesUnlocker", "BadgesUnlocker\BadgesUnlocker.csproj", "{4905937A-7CBC-4D6F-B779-519DBB16F821}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,16 +61,19 @@ Global
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19FB6245-4E64-4DE6-9E6D-32EC38324F58}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B6C2C8A-9B8A-4D84-8DCF-9551C25D9431}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA9006CD-D178-407C-98B9-5028217BCF41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA9006CD-D178-407C-98B9-5028217BCF41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA9006CD-D178-407C-98B9-5028217BCF41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA9006CD-D178-407C-98B9-5028217BCF41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4905937A-7CBC-4D6F-B779-519DBB16F821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4905937A-7CBC-4D6F-B779-519DBB16F821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4905937A-7CBC-4D6F-B779-519DBB16F821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4905937A-7CBC-4D6F-B779-519DBB16F821}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E01BC30F-3F17-4C41-A417-C3A2F993B13B}
 	EndGlobalSection
 EndGlobal

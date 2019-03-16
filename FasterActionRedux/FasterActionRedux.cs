@@ -1,47 +1,47 @@
-﻿using System.Xml;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using Harmony;
 using UnityEngine;
+using ModSettings;
 
 static class FasterActionRedux
 {
-    static string configFileName = "FasterActionRedux.xml";
     static float containerTime = 0.01f;
     static float actionTime = 0.1f;
+
+    internal class FasterActionReduxSettings : ModSettingsBase
+    {
+        [Name("Container opening time")]
+        [Description("Default value is varies for different actions, seconds")]
+        [Slider(0.01f, 1f, 100)]
+        public float containerTime = 0.01f;
+
+        [Name("Action time")]
+        [Description("Default value is varies for different actions, seconds")]
+        [Slider(0.1f, 2f, 200)]
+        public float actionTime = 0.1f;
+
+        protected override void OnConfirm()
+        {
+            FasterActionRedux.containerTime = containerTime;
+            FasterActionRedux.actionTime = actionTime;
+
+            string settings = FastJson.Serialize(this);
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "FasterActionRedux.json"), settings);
+        }
+    }
 
     static public void OnLoad()
     {
         Debug.LogFormat("FasterActionRedux: init");
 
-        string modsDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string configPath = Path.Combine(modsDir, configFileName);
+        FasterActionReduxSettings settings = new FasterActionReduxSettings();
+        string opts = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "FasterActionRedux.json"));
+        settings = FastJson.Deserialize<FasterActionReduxSettings>(opts);
+        settings.AddToModSettings("Faster Actions Redux");
 
-        XmlDocument xml = new XmlDocument();
-        xml.Load(configPath);
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/action_time"), out actionTime))
-        {
-            Debug.LogFormat("FasterActionRedux: missing/invalid 'action_time' entry");
-            actionTime = 0.1f;
-        }
-
-        if (!GetNodeFloat(xml.SelectSingleNode("/config/container_time"), out containerTime))
-        {
-            Debug.LogFormat("FasterActionRedux: missing/invalid 'container_time' entry");
-            containerTime = 0.01f;
-        }
-    }
-
-    static private bool GetNodeFloat(XmlNode node, out float value)
-    {
-        if (node == null || node.Attributes["value"] == null || !float.TryParse(node.Attributes["value"].Value, out value))
-        {
-            value = -1f;
-            return false;
-        }
-
-        return true;
+        containerTime = settings.containerTime;
+        actionTime = settings.actionTime;
     }
 
     // time for these actions is hardcoded or calculated on fly 
@@ -297,16 +297,19 @@ static class FasterActionRedux
         }
 
     }
+
+    // fix plant harvesting by TheWyrdsmith
+    // https://github.com/AlexTheRegent/tld-GameTweaks/issues/5
     // remove item text otherwise it will be stuck on screen 
-    [HarmonyPatch(typeof(Harvestable), "CompletedHarvest")]
-    public class FasterActionHarvestingPlantFix
-    { 
-        public static void Postfix(Harvestable __instance)
-        {
-            Debug.LogFormat("Harvestable::CompletedHarvest");
-            InterfaceManager.m_Panel_HUD.SetHoverText(string.Empty, null, false);
-        }
-    }
+    // [HarmonyPatch(typeof(Harvestable), "CompletedHarvest")]
+    // public class FasterActionHarvestingPlantFix
+    // { 
+        // public static void Postfix(Harvestable __instance)
+        // {
+            // Debug.LogFormat("Harvestable::CompletedHarvest");
+            // InterfaceManager.m_Panel_HUD.SetHoverText(string.Empty, null, false);
+        // }
+    // }
     
     // Weapon cleaning  
     [HarmonyPatch(typeof(Panel_Inventory_Examine), "StartClean")]
